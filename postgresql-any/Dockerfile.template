@@ -1,0 +1,16 @@
+From ubuntu:__UBUNTU_VERSION__
+MAINTAINER Daniel Lawrence <dannyla@linux.com>
+
+# Install Postgresql
+RUN apt-get install curl -y \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ __UBUNTU_CODENAME__-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && curl http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - \
+    && apt-get update \
+    && apt-get install postgresql-__POSTGRESQL_VERSION__ postgresql-client-__POSTGRESQL_VERSION__ postgresql-contrib-__POSTGRESQL_VERSION__ -y
+
+# configure it for docker
+RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/__POSTGRESQL_VERSION__/main/postgresql.conf \
+    && sed -i "/^# DO NOT DISABLE\!/i host all all 0.0.0.0/0 trust\n\n\n" /etc/postgresql/__POSTGRESQL_VERSION__/main/pg_hba.conf 
+
+EXPOSE 5432
+ENTRYPOINT su postgres -c '/usr/lib/postgresql/__POSTGRESQL_VERSION__/bin/postgres -c config_file=/etc/postgresql/__POSTGRESQL_VERSION__/main/postgresql.conf'
