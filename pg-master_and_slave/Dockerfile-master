@@ -1,0 +1,22 @@
+From ubuntu
+MAINTAINER Daniel Lawrence <dannyla@linux.com>
+
+# Install Postgresql
+RUN apt-get install curl -y \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && curl http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - \
+    && apt-get update \
+    && apt-get install postgresql-9.3 postgresql-client-9.3 postgresql-contrib-9.3 -y
+
+RUN apt-get install rsync openssh-server -y
+ 
+# configure it for docker
+RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/9.3/main/postgresql.conf \
+    && echo "wal_level = hot_standby" >> /etc/postgresql/9.3/main/postgresql.conf \
+    && echo "max_wal_senders = 3" >> /etc/postgresql/9.3/main/postgresql.conf \
+    && sed -i "/^# DO NOT DISABLE\!/i host all all 0.0.0.0/0 trust\n\n\n" /etc/postgresql/9.3/main/pg_hba.conf \
+    && echo "host  replication   all   0.0.0.0/0      trust" >> /etc/postgresql/9.3/main/pg_hba.conf \
+    && echo "su postgres -c '/usr/lib/postgresql/9.3/bin/postgres -c config_file=/etc/postgresql/9.3/main/postgresql.conf'" >> /.bashrc
+
+EXPOSE 5432
+ENTRYPOINT /bin/bash
