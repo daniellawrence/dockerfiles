@@ -7,5 +7,6 @@ RUN wget -q http://apt.puppetlabs.com/puppetlabs-release-precise.deb -O /tmp/pup
 RUN dpkg -i /tmp/puppetlabs.deb
 RUN apt-get update
 RUN apt-get -y install puppet 
+RUN echo "puppet agent -t --server \${PUPPETMASTER:-puppet}" > ~/.bashrc
 
 CMD ["/bin/bash"]
