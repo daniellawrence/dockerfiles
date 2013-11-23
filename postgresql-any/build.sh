@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash -x
 #--------------------------------------
 # Build the docker image 
 #--------------------------------------
@@ -50,9 +50,9 @@ cat Dockerfile.template | \
     | docker build -t ${UBUNTU_CODENAME}_postgresql:${POSTGRESQL_VERSION} -
 
 echo "Starting test instance"
-PG_TEST=$(docker run -d -t ${UBUNTU_CODENAME}_postgresql:${POSTGRESQL_VERSION})
+PG_TEST=$(docker run -d -P -t ${UBUNTU_CODENAME}_postgresql:${POSTGRESQL_VERSION})
 echo "Grabbing :5432 for $PG_TEST"
-PG_TEST_PORT=$(docker port $PG_TEST 5432)
+PG_TEST_PORT=$(docker port $PG_TEST 5432 | cut -d: -f2)
 echo "Waiting for ${PG_TEST}'s :${PG_TEST_PORT} to start..."
 sleep .25
 echo "Test psql conection and grabbing the version"
