@@ -1,0 +1,3 @@
+[submodule "docker-puppetmaster"]
+	path = docker-puppetmaster
+	url = https://github.com/daniellawrence/docker-puppetmaster
